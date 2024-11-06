@@ -10,13 +10,6 @@ class Task {
     this.dueDate = dueDate;
     this.status = 'not-started';
   }
-
-  update(title, priority, dueDate, status) {
-    this.title = title;
-    this.priority = priority;
-    this.dueDate = dueDate;
-    this.status = status;
-  }
 }
 
 export default Task;
