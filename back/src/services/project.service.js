@@ -1,8 +1,13 @@
 import Project from "../models/Project.js";
 import projectRepository from "../repositories/project.repository.js";
+import {ProjectError} from "../middlewares/CustomError.js";
 
 const createNewProject = async (title, description) => {
   const project = new Project(title, description);
+
+  if (!(project instanceof Project)) {
+    throw ProjectError.INVALID_PROJECT_ID;
+  }
 
   return await projectRepository.save(project);
 };
@@ -21,7 +26,13 @@ const getAllProjects = async () => {
 };
 
 const getProjectById = async (projectId) => {
-  return await projectRepository.findById(projectId);
+  const project = await projectRepository.findById(projectId);
+
+  if (!(project instanceof Project)) {
+    throw ProjectError.INVALID_PROJECT_ID;
+  }
+
+  return project;
 };
 
 const deleteProjectById = async (projectId) => {

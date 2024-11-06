@@ -1,14 +1,17 @@
 import {Router} from "express";
 import * as taskController from '../controllers/task.controller.js';
+import {validateAddTask, validateDeleteTaskById, validateEditTask} from "../validators/task.validator.js";
+import {validateParamProjectId} from "../validators/project.validator.js";
+import {validateHandler} from "../middlewares/validateHandler.js";
 
 const router = Router();
 
-router.post('/projects/:projectId/tasks/', taskController.addTask);
+router.post('/projects/:projectId/tasks/', validateAddTask, validateHandler, taskController.addTask);
 
-router.get('/projects/:projectId/tasks/', taskController.getTasksByProjectId);
+router.get('/projects/:projectId/tasks/', validateParamProjectId, validateHandler, taskController.getTasksByProjectId);
 
-router.put('/projects/:projectId/tasks/:taskId', taskController.editTaskById);
+router.put('/projects/:projectId/tasks/:taskId', validateEditTask, validateHandler, taskController.editTaskById);
 
-router.delete('/projects/:projectId/tasks/:taskId', taskController.deleteTaskById);
+router.delete('/projects/:projectId/tasks/:taskId', validateDeleteTaskById, validateHandler, taskController.deleteTaskById);
 
 export default router;

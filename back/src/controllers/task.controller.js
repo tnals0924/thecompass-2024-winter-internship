@@ -1,34 +1,50 @@
 import taskService from '../services/task.service.js';
 
-export const addTask = async (req, res) => {
-  const { pjId, title, description, priority, dueDate } = req.body;
+export const addTask = async (req, res, next) => {
+  try {
+    const { pjId, title, description, priority, dueDate } = req.body;
 
-  return res.status(200).json(
-    await taskService.addTask(Number(pjId), title, description, priority, dueDate)
-  );
+    return res.status(200).json(
+      await taskService.addTask(pjId, title, description, priority, dueDate)
+    );
+  } catch (error) {
+    next(error);
+  }
 };
 
-export const getTasksByProjectId = async (req, res) => {
-  const { projectId } = req.params;
+export const getTasksByProjectId = async (req, res, next) => {
+  try {
+    const { projectId } = req.params;
 
-  return res.status(200).json(
-    await taskService.getTasksByProjectId(Number(projectId))
-  );
+    return res.status(200).json(
+      await taskService.getTasksByProjectId(projectId)
+    );
+  } catch (error) {
+    next(error);
+  }
 };
 
-export const editTaskById = async (req, res) => {
-  const { projectId, taskId } = req.params;
-  const { title, priority, dueDate, status } = req.body;
+export const editTaskById = async (req, res, next) => {
+  try {
+    const { projectId, taskId } = req.params;
+    const { title, priority, dueDate, status } = req.body;
 
-  return res.status(200).json(
-    await taskService.editTaskById(Number(projectId), Number(taskId), title, priority, dueDate, status)
-  );
-}
+    return res.status(200).json(
+      await taskService.editTaskById(projectId, taskId, title, priority, dueDate, status)
+    );
+  } catch (error) {
+    next(error);
+  }
+};
 
-export const deleteTaskById = async (req, res) => {
-  const { projectId, taskId } = req.params;
+export const deleteTaskById = async (req, res, next) => {
+  try {
+    const { projectId, taskId } = req.params;
 
-  const deleted = await taskService.deleteTaskById(Number(projectId), Number(taskId));
+    const deleted = await taskService.deleteTaskById(projectId, taskId);
 
-  return (deleted) ? res.status(200).json(deleted) : res.status(204).send('no content');
+    return (deleted) ? res.status(200).json(deleted) : res.status(204).send('no content');
+  } catch (error) {
+    next(error);
+  }
 };

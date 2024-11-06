@@ -1,99 +1,80 @@
-let idIncrementAmount = 7;
+import { v4 as uuid } from 'uuid';
+import fs from 'fs';
+import path from 'path';
+import { ProjectError } from "../middlewares/CustomError.js";
 
-const projects = [
-  {
-    id: 1,
-    title: "프로젝트 제목1",
-    description: "설명",
-    tasks: [
-      {
-        "pjId": 1, // project id
-        "id": 1,
-        "title": "태스크 제목",
-        "description": "태스크 설명",
-        "priority": "high", // high | medium | low
-        "dueDate": "2024-11-10",
-        "status": "in-progress" // not-started | in-progress | done
-      },
-      {
-        "pjId": 1, // project id
-        "id": 2,
-        "title": "태스크 제목",
-        "description": "태스크 설명",
-        "priority": "high", // high | medium | low
-        "dueDate": "2024-11-10",
-        "status": "in-progress" // not-started | in-progress | done
+let cachedProjects = [];
+
+const init = () => {
+  const projectsDir = './projects';
+
+  if (!fs.existsSync(projectsDir)) {
+    fs.mkdirSync(projectsDir);
+    console.log('projects 폴더 생성');
+  } else {
+    console.log('projects 폴더가 이미 존재합니다.');
+  }
+
+  loadAllProjectsFromFile();
+}
+
+const loadAllProjectsFromFile = () => {
+  const projectsDir = './projects';
+  const projects = [];
+
+  const files = fs.readdirSync(projectsDir);
+
+  files.forEach(file => {
+    if (path.extname(file) === '.json') {
+      const filePath = path.join(projectsDir, file);
+      try {
+        const data = fs.readFileSync(filePath, 'utf8');
+        projects.push(JSON.parse(data));
+      } catch (error) {
+        throw ProjectError.CANNOT_LOAD_FROM_FILE;
       }
-    ],
-  },
-  {
-    id: 2,
-    title: "프로젝트 제목1",
-    description: "설명",
-    tasks: [
-      {
-        "pjId": 2, // project id
-        "id": 3,
-        "title": "태스크 제목",
-        "description": "태스크 설명",
-        "priority": "high", // high | medium | low
-        "dueDate": "2024-11-10",
-        "status": "in-progress" // not-started | in-progress | done
-      }
-    ],
-  },
-  {
-    id: 3,
-    title: "프로젝트 제목1",
-    description: "설명",
-    tasks: [],
-  },
-  {
-    id: 4,
-    title: "프로젝트 제목1",
-    description: "설명",
-    tasks: [],
-  },
-  {
-    id: 5,
-    title: "프로젝트 제목1",
-    description: "설명",
-    tasks: [],
-  },
-  {
-    id: 6,
-    title: "프로젝트 제목1",
-    description: "설명",
-    tasks: [],
-  },
-  {
-    id: 7,
-    title: "프로젝트 제목1",
-    description: "설명",
-    tasks: [],
-  },
-];
+    }
+  });
+
+  cachedProjects = projects;
+}
+
+const saveProjectToFile = (project) => {
+  const filePath = `./projects/${project.id}.json`;
+  const jsonData = JSON.stringify(project);
+
+  if (!jsonData) {
+    throw ProjectError.CANNOT_SAVE_TO_FILE;
+  }
+
+  fs.writeFile(filePath, jsonData, 'utf8', (err) => {
+    if (err) {
+      throw ProjectError.CANNOT_SAVE_TO_FILE;
+    }
+  });
+};
 
 const save = async (project) => {
   const found = await findById(project.id);
 
   if (found) {
-    const foundIndex = projects.indexOf(found);
-    projects.splice(foundIndex, 1, project);
+    const foundIndex = cachedProjects.indexOf(found);
+    cachedProjects.splice(foundIndex, 1, project);
   } else {
-    project.id = ++idIncrementAmount;
-    projects.push(project);
+    cachedProjects.push(project);
   }
+
+  saveProjectToFile(project);
 
   return project;
 }
 
 const findAll = async () => {
-  return [...projects];
+  return [...cachedProjects];
 }
 
 const findById = async (id) => {
-  return projects.find(((project) => project.id === id));
+  return cachedProjects.find((project) => project.id === id);
 }
 
 const deleteById = async (id) => {
@@ -101,12 +82,13 @@ const deleteById = async (id) => {
 
   if (!found) return false;
 
-  const foundIndex = projects.indexOf(found);
-  projects.splice(foundIndex, 1);
+  const foundIndex = cachedProjects.indexOf(found);
+  cachedProjects.splice(foundIndex, 1);
   return true;
 }
 
 export default {
+  init,
   save,
   findAll,
   findById,

@@ -1,21 +1,18 @@
 import projectRepository from "./project.repository.js";
 
-let idIncrementAmount = 2;
-
 const save = async (newTask) => {
   const { project, task } = await findProjectAndTaskById(newTask.pjId, newTask.id);
 
-  console.log(project);
+  //console.log(project);
 
   if (!project.tasks) return null;
 
-  const tasks = project.tasks
+  const tasks = project.tasks;
 
   if (task) {
     const foundIndex = tasks.indexOf(newTask);
     tasks.splice(foundIndex, 1, newTask);
   } else {
-    newTask.id = ++idIncrementAmount;
     tasks.push(newTask);
   }
 
@@ -27,7 +24,7 @@ const save = async (newTask) => {
 const findAllByProjectId = async (projectId) => {
   const project = await projectRepository.findById(projectId);
 
-  console.log(project);
+  //console.log(project);
 
   if (!project) return null;
 
@@ -53,9 +50,9 @@ const deleteById = async (projectId, taskId) => {
 const findProjectAndTaskById = async (projectId, taskId) => {
   const project = await projectRepository.findById(projectId);
 
-  console.log(project);
+  //console.log(project);
 
-  if (!project.tasks) return { project };
+  if (!project.tasks) return { project, tasks: [] };
 
   const task = project.tasks.find((task) => task.id === taskId);
 
