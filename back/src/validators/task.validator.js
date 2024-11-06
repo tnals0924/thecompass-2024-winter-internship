@@ -39,8 +39,12 @@ export const validateAddTask = [
     .withMessage('description은 필수로 입력해야 합니다.')
     .isString()
     .withMessage('description은 문자열로 입력해야 합니다.'),
+  body('dueDate')
+    .notEmpty()
+    .withMessage('dueDate는 필수로 입력해야 합니다.')
+    .isString()
+    .withMessage('dueDate는 날짜로 입력해야 합니다.'),
   validateBodyPriority,
-  validateBodyStatus,
 ];
 
 export const validateEditTask = [

@@ -43,7 +43,7 @@ export const deleteTaskById = async (req, res, next) => {
 
     const deleted = await taskService.deleteTaskById(projectId, taskId);
 
-    return (deleted) ? res.status(200).json(deleted) : res.status(204).send('no content');
+    return (deleted) ? res.status(200).json("Ok") : res.status(404).send('Not Found');
   } catch (error) {
     next(error);
   }
