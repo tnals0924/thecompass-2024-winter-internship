@@ -29,7 +29,7 @@ const editTaskById = async (projectId, taskId, title, priority, dueDate, status)
 };
 
 const deleteTaskById = async (projectId, taskId) => {
-  return await deleteTaskById(projectId, taskId);
+  return await taskRepository.deleteById(projectId, taskId);
 };
 
 export default {

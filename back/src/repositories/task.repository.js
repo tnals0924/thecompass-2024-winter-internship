@@ -44,6 +44,9 @@ const deleteById = async (projectId, taskId) => {
 
   const taskIndex = project.tasks.indexOf(taskId);
   project.tasks.splice(taskIndex, 1);
+
+  await projectRepository.save(project);
+
   return true;
 }
 

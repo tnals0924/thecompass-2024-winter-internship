@@ -1,7 +1,7 @@
-import { v4 as uuid } from 'uuid';
 import fs from 'fs';
 import path from 'path';
 import { ProjectError } from "../middlewares/CustomError.js";
+import project from "../models/Project.js";
 
 let cachedProjects = [];
 
@@ -39,9 +39,20 @@ const loadAllProjectsFromFile = () => {
   cachedProjects = projects;
 }
 
+const deleteProjectFile = (project) => {
+  const filePath = `./projects/${project.id}.json`;
+
+  try {
+    fs.unlinkSync(filePath);
+  } catch(error) {
+    console.warn(error);
+    throw ProjectError.CANNOT_LOAD_FROM_FILE;
+  }
+}
+
 const saveProjectToFile = (project) => {
   const filePath = `./projects/${project.id}.json`;
-  const jsonData = JSON.stringify(project);
+  const jsonData = JSON.stringify(project, null, 2);
 
   if (!jsonData) {
     throw ProjectError.CANNOT_SAVE_TO_FILE;
@@ -49,6 +60,7 @@ const saveProjectToFile = (project) => {
 
   fs.writeFile(filePath, jsonData, 'utf8', (err) => {
     if (err) {
+      console.warn(err);
       throw ProjectError.CANNOT_SAVE_TO_FILE;
     }
   });
@@ -83,7 +95,10 @@ const deleteById = async (id) => {
   if (!found) return false;
 
   const foundIndex = cachedProjects.indexOf(found);
+
   cachedProjects.splice(foundIndex, 1);
+  deleteProjectFile(found);
+
   return true;
 }
 
